@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Javis</title>
+<meta name="description" content="Javis is a voice-first personal assistant for the Mac. It sees your screen, acts in any app or browser, remembers you, and improves itself.">
+<meta property="og:title" content="Javis">
+<meta property="og:description" content="A presence on your Mac, not a chat box. Talk to it, and it does the work.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='22' fill='%23a6ff6a'/%3E%3Ccircle cx='32' cy='32' r='9' fill='%23071a14'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --ground:#06110e; --ground-2:#0a1915; --panel:#0f201b; --rule:#1d342c;
+    --ink:#eaf5ef; --ink-mid:#a9bfb5; --ink-soft:#73897f;
+    --glow:#a6ff6a; --glow-2:#4fd6db; --glow-soft:rgba(166,255,106,.14);
+    --display:"Bricolage Grotesque","Instrument Sans",system-ui,sans-serif;
+    --body:"Instrument Sans",ui-sans-serif,system-ui,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  .k{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--glow)}
+  h1,h2,h3{font-family:var(--display);letter-spacing:-.015em;text-wrap:balance;margin:0}
+  h2{font-size:clamp(30px,4vw,44px);font-weight:700;line-height:1.08}
+  h3{font-size:19px;font-weight:600}
+  p{margin:0}
+  .muted{color:var(--ink-mid)}
+
+  nav{position:sticky;top:0;z-index:10;backdrop-filter:blur(12px);background:color-mix(in srgb,var(--ground) 72%,transparent);border-bottom:1px solid color-mix(in srgb,var(--rule) 70%,transparent)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:800;font-size:20px;text-decoration:none;letter-spacing:-.02em}
+  .brand i{width:14px;height:14px;border-radius:50%;background:var(--glow);box-shadow:0 0 18px var(--glow)}
+  nav ul{display:flex;gap:26px;list-style:none;margin:0;padding:0;font-size:14.5px}
+  nav ul a{text-decoration:none;color:var(--ink-mid)} nav ul a:hover{color:var(--ink)}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:999px;font-weight:600;font-size:15px;text-decoration:none;border:1px solid var(--rule);color:var(--ink);background:var(--panel);transition:transform .15s,border-color .15s}
+  .btn:hover{transform:translateY(-1px);border-color:var(--glow)}
+  .btn.primary{background:var(--glow);color:#06110e;border-color:var(--glow)}
+  .btn.primary:hover{box-shadow:0 0 0 6px var(--glow-soft)}
+  .btn:focus-visible,a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--glow);outline-offset:3px}
+  @media(max-width:720px){nav ul{display:none}}
+
+  .hero{position:relative;padding:72px 0 40px;overflow:hidden}
+  .hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+  .hero h1{font-size:clamp(44px,6.6vw,84px);font-weight:800;line-height:.98}
+  .hero h1 em{font-style:normal;color:var(--glow)}
+  .lede{font-size:clamp(18px,1.6vw,21px);color:var(--ink-mid);max-width:50ch;margin-top:22px}
+  .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+  .say{margin-top:34px;display:flex;flex-direction:column;gap:8px;max-width:48ch}
+  .say span{font-family:var(--mono);font-size:13px;color:var(--ink-soft);padding:8px 12px;border:1px solid var(--rule);border-radius:10px;background:color-mix(in srgb,var(--panel) 70%,transparent);width:max-content;max-width:100%}
+  .say span b{color:var(--glow);font-weight:500}
+  .orbbox{position:relative;display:grid;place-items:center;min-height:420px}
+  .orbbox canvas{width:min(100%,460px);aspect-ratio:1;display:block}
+  .orbbox .halo{position:absolute;inset:10%;border-radius:50%;background:radial-gradient(circle,var(--glow-soft),transparent 65%);filter:blur(20px);pointer-events:none}
+  .cap{position:absolute;bottom:4%;left:50%;transform:translateX(-50%);font-size:14px;color:var(--ink);padding:9px 16px;border-radius:14px;background:color-mix(in srgb,var(--panel) 92%,transparent);border:1px solid var(--rule);white-space:nowrap;box-shadow:0 20px 50px -30px #000}
+  @media(max-width:860px){.hero .wrap{grid-template-columns:1fr}.orbbox{min-height:300px;order:-1}}
+
+  section{padding:84px 0}
+  .head{display:grid;gap:12px;max-width:62ch;margin-bottom:40px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--rule);border-radius:18px;padding:24px;display:grid;gap:10px;align-content:start}
+  .card .n{font-family:var(--mono);font-size:12px;color:var(--glow)}
+  .card p{color:var(--ink-mid);font-size:15.5px}
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:28px;counter-reset:s}
+  .step{display:grid;gap:10px;padding-top:18px;border-top:1px solid var(--rule)}
+  .step::before{counter-increment:s;content:"0" counter(s);font-family:var(--mono);font-size:12px;color:var(--glow);letter-spacing:.12em}
+  .step p{color:var(--ink-mid);font-size:15.5px}
+  .band{background:var(--ground-2);border-top:1px solid var(--rule);border-bottom:1px solid var(--rule)}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+  .split ul{margin:0;padding:0;list-style:none;display:grid;gap:14px}
+  .split li{display:grid;grid-template-columns:22px 1fr;gap:12px;color:var(--ink-mid);font-size:16px}
+  .split li i{width:10px;height:10px;border-radius:50%;background:var(--glow);margin-top:9px}
+  .split li b{color:var(--ink);font-weight:600}
+  @media(max-width:800px){.split{grid-template-columns:1fr}}
+  .quote{font-family:var(--display);font-size:clamp(22px,2.6vw,30px);font-weight:500;line-height:1.3;max-width:28ch;color:var(--ink)}
+  .quote em{color:var(--glow);font-style:normal}
+
+  form{display:grid;gap:12px;max-width:520px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:560px){.row{grid-template-columns:1fr}}
+  input,textarea{width:100%;font:inherit;font-size:15px;color:var(--ink);background:var(--ground);border:1px solid var(--rule);border-radius:12px;padding:12px 14px}
+  input::placeholder,textarea::placeholder{color:var(--ink-soft)}
+  textarea{min-height:92px;resize:vertical}
+  button.btn{cursor:pointer;font:inherit}
+  .fine{font-size:13px;color:var(--ink-soft)}
+  footer{padding:36px 0 48px;border-top:1px solid var(--rule);color:var(--ink-soft);font-size:14px}
+  footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Javis home"><i></i>Javis</a>
+    <ul>
+      <li><a href="#does">What it does</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#why">Why Javis</a></li>
+      <li><a href="#access">Early access</a></li>
+    </ul>
+    <a class="btn primary" href="#access">Request early access</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div>
+      <div class="k">Personal assistant for the Mac</div>
+      <h1 style="margin-top:14px">A presence on your Mac.<br>Not a <em>chat box.</em></h1>
+      <p class="lede">Javis listens for its name, sees what you see, and does the work: in your browser, your mail, your editor, any app. It remembers you, speaks up when something is due, and improves its own code when you ask.</p>
+      <div class="cta">
+        <a class="btn primary" href="#access">Request early access</a>
+        <a class="btn" href="#how">How it works</a>
+      </div>
+      <div class="say" aria-label="Examples of things you can say">
+        <span><b>“Javis,</b> reply to this mail and say Thursday works.”</span>
+        <span><b>“Javis,</b> every weekday at six, summarise what I missed.”</span>
+        <span><b>“Javis,</b> what does this error mean?”</span>
+      </div>
+    </div>
+    <div class="orbbox" aria-hidden="true">
+      <div class="halo"></div>
+      <canvas id="orb" width="560" height="560"></canvas>
+      <div class="cap">Go on, sir. I’m listening.</div>
+    </div>
+  </div>
+</header>
+
+<section id="does">
+  <div class="wrap">
+    <div class="head">
+      <div class="k">What it does</div>
+      <h2>Talk to it the way you’d talk to a very good assistant.</h2>
+      <p class="muted">One name, then the request. Javis works out the rest.</p>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="n">Hears</div><h3>Hands-free, on-device</h3><p>Say its name and speak. Speech recognition runs on your Mac, replies come back in about a second, and you can talk over it to interrupt.</p></div>
+      <div class="card"><div class="n">Sees</div><h3>Looks at your screen</h3><p>Ask about “this” and it looks: the error in front of you, the page you’re reading, the message you want answered.</p></div>
+      <div class="card"><div class="n">Acts</div><h3>Works in any app or browser</h3><p>Clicks, types, fills forms, opens things. In Brave, Chrome, Safari, Mail, your editor. It checks the result before it says it’s done.</p></div>
+      <div class="card"><div class="n">Remembers</div><h3>Knows you across sessions</h3><p>People, projects, preferences, how you like things done. Tell it once. It even learns your words when you correct a mishearing.</p></div>
+      <div class="card"><div class="n">Speaks up</div><h3>Reminders and routines</h3><p>“In twenty minutes, remind me.” “Every morning at nine, my calendar and what’s waiting on me.” It runs them and tells you.</p></div>
+      <div class="card"><div class="n">Grows</div><h3>Improves itself</h3><p>Ask for a new behaviour and Javis offers options on screen, edits its own code, runs its tests, and restarts. If a change breaks it, it rolls back and says so.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="how" class="band">
+  <div class="wrap">
+    <div class="head">
+      <div class="k">How it works</div>
+      <h2>Ears on the Mac. A Claude brain. Hands in every app.</h2>
+    </div>
+    <div class="steps">
+      <div class="step"><h3>You speak</h3><p>A floating orb sits over whatever you’re doing. Apple’s on-device recogniser hears you; nothing you say leaves the machine to be transcribed.</p></div>
+      <div class="step"><h3>Javis thinks</h3><p>Claude plans the work, asks you on a card when it needs a decision, and hands long jobs to background workers so it never goes quiet on you.</p></div>
+      <div class="step"><h3>Javis acts, then looks again</h3><p>Through the Mac’s own accessibility layer and the browser’s developer protocol, it clicks and types like you would, and verifies the result before reporting back in its own voice.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="why">
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <div class="k">Why Javis</div>
+        <p class="quote" style="margin-top:14px">Every assistant so far has been a box you type into. <em>Javis is someone you talk to, who can reach the keyboard.</em></p>
+      </div>
+      <ul>
+        <li><i></i><span><b>Runs on your Mac.</b> Local speech recognition and a local neural voice. Your screen is only looked at when you ask.</span></li>
+        <li><i></i><span><b>Does, then proves.</b> It never says “done” without looking at the result.</span></li>
+        <li><i></i><span><b>Asks before anything irreversible.</b> Sending, paying, deleting, posting: a card appears, and the last tap is yours.</span></li>
+        <li><i></i><span><b>Keeps a log.</b> Everything it heard, did and got wrong is on record. Ask “what went wrong?” and it tells you.</span></li>
+        <li><i></i><span><b>Built for daily work.</b> Mail, calendar, browsing, research, code chores. The repetitive hours, handed off.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="access" class="band">
+  <div class="wrap">
+    <div class="head">
+      <div class="k">Early access</div>
+      <h2>We’re onboarding a small group of Mac users first.</h2>
+      <p class="muted">Tell us what you’d hand off first. We read every one.</p>
+    </div>
+    <form name="early-access" method="POST" data-netlify="true" netlify-honeypot="company" action="thanks.html">
+      <input type="hidden" name="form-name" value="early-access">
+      <p style="display:none"><label>Leave this empty <input name="company"></label></p>
+      <div class="row">
+        <input type="text" name="name" placeholder="Your name" autocomplete="name" required>
+        <input type="email" name="email" placeholder="Email" autocomplete="email" required>
+      </div>
+      <textarea name="use" placeholder="What would you hand off first?"></textarea>
+      <div><button class="btn primary" type="submit">Request early access</button></div>
+      <p class="fine">macOS only for now. No spam, one email when your invite is ready.</p>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span><strong style="color:var(--ink)">Javis</strong> · a personal assistant that does the work</span>
+    <span>© 2026 Javis</span>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const cv = document.getElementById("orb"); if (!cv) return;
+  const ctx = cv.getContext("2d"); if (!ctx) return;
+  const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const N = 420, pts = [], golden = Math.PI * (3 - Math.sqrt(5));
+  for (let i = 0; i < N; i++) { const y = 1 - (i / (N - 1)) * 2, r = Math.sqrt(1 - y * y), a = golden * i; pts.push([Math.cos(a) * r, y, Math.sin(a) * r]); }
+  const edges = [];
+  for (let i = 0; i < N; i++) {
+    const near = pts.map((p, j) => [j, (p[0]-pts[i][0])**2 + (p[1]-pts[i][1])**2 + (p[2]-pts[i][2])**2]).filter(n => n[0] !== i).sort((a, b) => a[1] - b[1]).slice(0, 3);
+    for (const [j] of near) if (i < j) edges.push([i, j]);
+  }
+  const sparks = Array.from({ length: 10 }, () => ({ e: Math.floor(Math.random() * edges.length), t: Math.random(), v: .6 + Math.random() }));
+  let rotY = 0, rotX = .35, t0 = performance.now();
+  const glow = "#a6ff6a", second = "#4fd6db", ink = "#eaf5ef";
+  function frame(now) {
+    const t = now - t0, w = cv.width, h = cv.height, cx = w / 2, cy = h / 2;
+    ctx.clearRect(0, 0, w, h);
+    const breath = .14 + Math.sin(t / 900) * .05;
+    if (!calm) { rotY += .004 + breath * .01; rotX = .35 + Math.sin(t / 4000) * .15; }
+    const R = Math.min(w, h) * (.40 + breath * .05), cY = Math.cos(rotY), sY = Math.sin(rotY), cX = Math.cos(rotX), sX = Math.sin(rotX);
+    const P = new Float32Array(N * 3);
+    for (let i = 0; i < N; i++) {
+      const p = pts[i]; const x = p[0] * cY - p[2] * sY; let z = p[0] * sY + p[2] * cY; const y = p[1] * cX - z * sX; z = p[1] * sX + z * cX;
+      const bulge = 1 + Math.sin(t / 300 + i * .37) * .02, persp = 1 / (1.9 - z * .6);
+      P[i*3] = cx + x * R * bulge * persp; P[i*3+1] = cy + y * R * bulge * persp; P[i*3+2] = z;
+    }
+    ctx.lineWidth = .9;
+    for (const [a, b] of edges) { const d = (P[a*3+2] + P[b*3+2]) / 2; if (d < -.25) continue; ctx.globalAlpha = .10 + (d + .25) * .30; ctx.strokeStyle = d > .45 ? glow : second; ctx.beginPath(); ctx.moveTo(P[a*3], P[a*3+1]); ctx.lineTo(P[b*3], P[b*3+1]); ctx.stroke(); }
+    for (let i = 0; i < N; i++) { const z = P[i*3+2]; if (z < -.35) continue; ctx.globalAlpha = Math.min(1, .15 + (z + .35) * .55); ctx.fillStyle = z > .5 ? ink : glow; ctx.beginPath(); ctx.arc(P[i*3], P[i*3+1], .9 + (z + 1) * .9, 0, Math.PI * 2); ctx.fill(); }
+    for (const s of sparks) {
+      s.t += .012 * s.v; if (s.t >= 1) { const b = edges[s.e][1]; const opts = edges.map((ed, k) => (ed[0] === b || ed[1] === b) ? k : -1).filter(k => k >= 0); s.e = opts.length ? opts[Math.floor(Math.random() * opts.length)] : Math.floor(Math.random() * edges.length); s.t = 0; }
+      const [a, b] = edges[s.e], z = (P[a*3+2] + P[b*3+2]) / 2; if (z < -.2) continue;
+      ctx.globalAlpha = .5 + z * .5; ctx.fillStyle = ink; ctx.shadowColor = glow; ctx.shadowBlur = 12; ctx.beginPath();
+      ctx.arc(P[a*3] + (P[b*3] - P[a*3]) * s.t, P[a*3+1] + (P[b*3+1] - P[a*3+1]) * s.t, 2.2, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
+    }
+    const coreR = R * (.16 + breath * .1), g = ctx.createRadialGradient(cx, cy, 0, cx, cy, coreR * 1.8);
+    g.addColorStop(0, glow); g.addColorStop(.45, glow); g.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.globalAlpha = .6 + Math.sin(t / 700) * .15; ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, coreR * 1.8, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1;
+    if (!calm) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+<script>
+(() => {
+  const f = document.querySelector('form[name="early-access"]'); if (!f) return;
+  if (!/netlify\.app$|netlify\.com$/.test(location.hostname) && !f.dataset.custom) {
+    f.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const d = new FormData(f);
+      const body = `Name: ${d.get("name")}\nEmail: ${d.get("email")}\n\n${d.get("use") || ""}`;
+      location.href = "mailto:naman.khandelwal@centific.com?subject=" + encodeURIComponent("Javis early access") + "&body=" + encodeURIComponent(body);
+      setTimeout(() => { location.href = "thanks.html"; }, 800);
+    });
+  }
+})();
+</script>
+</body>
+</html>
